@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rifa de Shirley Acurio</title>
+
+<style>
+body{
+font-family:Arial,sans-serif;
+background:#f5f5f5;
+margin:0;
+padding:20px;
+text-align:center;
+}
+
+h1{
+color:#d60000;
+}
+
+p{
+font-size:18px;
+}
+
+.grid{
+display:grid;
+grid-template-columns:repeat(10,1fr);
+gap:8px;
+margin-top:20px;
+}
+
+.numero{
+background:#2ecc71;
+color:white;
+padding:12px 0;
+border-radius:8px;
+font-weight:bold;
+cursor:pointer;
+user-select:none;
+}
+
+.numero.vendido{
+background:#e74c3c;
+}
+
+@media(max-width:700px){
+.grid{
+grid-template-columns:repeat(5,1fr);
+}
+}
+</style>
+</head>
+
+<body>
+
+<h1>🎉 Rifa de Shirley Acurio 🎉</h1>
+
+<p>
+Toca un número para reservarlo.<br>
+🟢 Disponible &nbsp;&nbsp; 🔴 Vendido
+</p>
+
+<div class="grid" id="grid"></div>
+
+<script>
+const grid=document.getElementById("grid");
+
+for(let i=1;i<=100;i++){
+
+const n=document.createElement("div");
+
+n.className="numero";
+
+n.innerHTML=i;
+
+n.onclick=function(){
+
+n.classList.toggle("vendido");
+
+}
+
+grid.appendChild(n);
+
+}
+</script>
+
+</body>
+</html>
