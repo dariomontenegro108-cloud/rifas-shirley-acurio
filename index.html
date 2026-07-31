@@ -3,85 +3,197 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Rifa de Shirley Acurio</title>
+<title>Rifa de Shirley Acurio 🎉</title>
 
 <style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial,Helvetica,sans-serif;
+}
+
 body{
-font-family:Arial,sans-serif;
-background:#f5f5f5;
-margin:0;
-padding:20px;
-text-align:center;
+    background:#f5f5f5;
+    padding:20px;
+}
+
+.container{
+    max-width:700px;
+    margin:auto;
+    background:white;
+    padding:20px;
+    border-radius:15px;
+    box-shadow:0 5px 15px rgba(0,0,0,.15);
 }
 
 h1{
-color:#d60000;
+    text-align:center;
+    margin-bottom:10px;
 }
 
 p{
-font-size:18px;
+    text-align:center;
+    margin-bottom:15px;
 }
 
 .grid{
-display:grid;
-grid-template-columns:repeat(10,1fr);
-gap:8px;
-margin-top:20px;
+    display:grid;
+    grid-template-columns:repeat(5,1fr);
+    gap:10px;
 }
 
 .numero{
-background:#2ecc71;
-color:white;
-padding:12px 0;
-border-radius:8px;
-font-weight:bold;
-cursor:pointer;
-user-select:none;
+    padding:18px 0;
+    text-align:center;
+    border-radius:10px;
+    cursor:pointer;
+    color:white;
+    font-size:20px;
+    font-weight:bold;
+    background:#28a745;
+    transition:.2s;
 }
 
-.numero.vendido{
-background:#e74c3c;
+.numero:hover{
+    transform:scale(1.05);
+}
+
+.vendido{
+    background:#dc3545;
 }
 
 @media(max-width:700px){
 .grid{
 grid-template-columns:repeat(5,1fr);
 }
+
+.numero{
+font-size:18px;
+padding:16px 0;
+}
 }
 </style>
+
 </head>
 
 <body>
 
+<div class="container">
+
 <h1>🎉 Rifa de Shirley Acurio 🎉</h1>
 
 <p>
-Toca un número para reservarlo.<br>
-🟢 Disponible &nbsp;&nbsp; 🔴 Vendido
+Seleccione un número para reservarlo.
+<br><br>
+🟢 Disponible &nbsp;&nbsp;
+🔴 Vendido
 </p>
 
 <div class="grid" id="grid"></div>
 
-<script>
+</div>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+import {
+getFirestore,
+doc,
+getDoc,
+setDoc
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig = {
+apiKey:"AIzaSyB0aPCdMqkzMnNfdfaqEg2mOiSrpayii2E",
+authDomain:"rifas-de-shirley-acurio.firebaseapp.com",
+projectId:"rifas-de-shirley-acurio",
+storageBucket:"rifas-de-shirley-acurio.firebasestorage.app",
+messagingSenderId:"181409444075",
+appId:"1:181409444075:web:bb1ebfa392e658d0148eae"
+};
+
+const app=initializeApp(firebaseConfig);
+const db=getFirestore(app);
+
 const grid=document.getElementById("grid");
 
-for(let i=1;i<=100;i++){
+let vendidos=[];
 
-const n=document.createElement("div");
+const ref=doc(db,"rifa","numeros");async function cargarNumeros(){
 
-n.className="numero";
+    const snap = await getDoc(ref);
 
-n.innerHTML=i;
+    if(snap.exists()){
 
-n.onclick=function(){
+        vendidos = snap.data().vendidos || [];
 
-n.classList.toggle("vendido");
+    }else{
+
+        vendidos = [];
+
+        await setDoc(ref,{
+            vendidos:[]
+        });
+
+    }
+
+    dibujar();
 
 }
 
-grid.appendChild(n);
+function dibujar(){
+
+    grid.innerHTML="";
+
+    for(let i=1;i<=50;i++){
+
+        const div=document.createElement("div");
+
+        div.className="numero";
+
+        div.innerHTML=i;
+
+        if(vendidos.includes(i)){
+
+            div.classList.add("vendido");
+
+        }
+
+        div.onclick=()=>cambiarNumero(i);
+
+        grid.appendChild(div);
+
+    }
+
+}async function cambiarNumero(numero){
+
+    if(vendidos.includes(numero)){
+
+        if(!confirm("¿Deseas liberar este número?")) return;
+
+        vendidos = vendidos.filter(n => n !== numero);
+
+    }else{
+
+        if(!confirm("¿Confirmar la venta del número " + numero + "?")) return;
+
+        vendidos.push(numero);
+
+        vendidos.sort((a,b)=>a-b);
+
+    }
+
+    await updateDoc(ref,{
+        vendidos: vendidos
+    });
+
+    dibujar();
 
 }
+
+cargarNumeros();
 </script>
 
 </body>
